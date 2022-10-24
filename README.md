@@ -1,2 +1,2 @@
 # metafora
-A quick and Strong drive !
+A quick and strong drive !
