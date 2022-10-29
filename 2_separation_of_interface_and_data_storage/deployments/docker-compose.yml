@@ -1,0 +1,125 @@
+version: "3.7"
+
+services:
+  nginx:
+    # 提供apiserver1和apiserver2的负载均衡
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    depends_on:
+      - apiserver1
+      - apiserver2
+    links:
+      - apiserver1
+      - apiserver2
+    ports:
+      - 8888:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - metaforanet
+
+  apiserver1:
+    #生成容器名称
+    # build: ../api-server
+    container_name: apiserver1
+    image: alpine:latest
+    # 关机或者重启docker同时重启容器
+    restart: always
+    depends_on:
+      - rabbitmq
+      - dataserver1
+      - dataserver2
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:8000
+    volumes:
+      - ../api-server/apiServer:/app/apiServer
+      - ./wait-for:/wait-for
+    command: sh -c '/wait-for rabbitmq:5672 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
+
+  apiserver2:
+    # build: ../api-server
+    container_name: apiserver2
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+      - dataserver1
+      - dataserver2
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:8000
+    volumes:
+      - ../api-server/apiServer:/app/apiServer
+      - ./wait-for:/wait-for
+    command: sh -c '/wait-for rabbitmq:5672 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
+
+  dataserver1:
+    # build: ../data-server
+    container_name: dataserver1
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver1:5000
+      - STORAGE_ROOT=/tmp/data1
+    volumes:
+      - ../data-server/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/data1:/tmp/data1
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver2:
+    # build: ../data-server
+    container_name: dataserver2
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver2:5000
+      - STORAGE_ROOT=/tmp/data2
+    volumes:
+      - ../data-server/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/data2:/tmp/data2
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    container_name: "mtfr_rabbitmq"
+    restart: always
+    ports:
+      # 暴露给外部的端口
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=123456
+    networks:
+      - metaforanet
+
+networks:
+  metaforanet:

@@ -1,0 +1,1 @@
+sudo env GOOS=linux GOARCH=386 go build apiServer.go
