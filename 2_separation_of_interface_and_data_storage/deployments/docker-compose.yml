@@ -38,7 +38,7 @@ services:
       - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
       - LISTEN_ADDRESS=0.0.0.0:8000
     volumes:
-      - ../api-server/apiServer:/app/apiServer
+      - ../api-server/build/apiServer:/app/apiServer
       - ./wait-for:/wait-for
     command: sh -c '/wait-for rabbitmq:5672 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
 
@@ -59,7 +59,7 @@ services:
       - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
       - LISTEN_ADDRESS=0.0.0.0:8000
     volumes:
-      - ../api-server/apiServer:/app/apiServer
+      - ../api-server/build/apiServer:/app/apiServer
       - ./wait-for:/wait-for
     command: sh -c '/wait-for rabbitmq:5672 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
 
@@ -80,7 +80,7 @@ services:
       - DATA_SERVER_ADDRESS=dataserver1:5000
       - STORAGE_ROOT=/tmp/data1
     volumes:
-      - ../data-server/dataServer:/app/dataServer
+      - ../data-server/build/dataServer:/app/dataServer
       - ./wait-for:/wait-for
       - ./files/data1:/tmp/data1
     command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
@@ -102,7 +102,7 @@ services:
       - DATA_SERVER_ADDRESS=dataserver2:5000
       - STORAGE_ROOT=/tmp/data2
     volumes:
-      - ../data-server/dataServer:/app/dataServer
+      - ../data-server/build/dataServer:/app/dataServer
       - ./wait-for:/wait-for
       - ./files/data2:/tmp/data2
     command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
