@@ -1,0 +1,6 @@
+export RABBITMQ_SERVER=amqp://root:123456@127.0.0.1:5672
+export LISTEN_ADDRESS=127.0.0.1:8001
+export DATA_SERVER_ADDRESS=127.0.0.1:8001
+export STORAGE_ROOT=./files/ds1/
+
+./dataServer

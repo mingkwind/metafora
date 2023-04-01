@@ -1,0 +1,9 @@
+{
+    "launch": {
+        "configurations": [],
+        "compounds": []
+    },
+    "go.goroot": "",
+    "go.gopath": "",
+    "go.useLanguageServer": true
+}

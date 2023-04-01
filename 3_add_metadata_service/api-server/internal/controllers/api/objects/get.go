@@ -46,6 +46,7 @@ func GetObjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func getStream(hash string) (io.Reader, error) {
+	// hash 就作为这个文件的文件名
 	server, err := locate.Locate(hash)
 	if err != nil {
 		return nil, err

@@ -71,6 +71,7 @@ func putObject(w http.ResponseWriter, r *http.Request) {
 }
 
 func getObject(w http.ResponseWriter, r *http.Request) {
+	//  显示当前所在目录
 	file, err := os.Open(settings.StorageRoot + r.URL.EscapedPath())
 	if err != nil {
 		log.Println(err)

@@ -14,6 +14,7 @@ func Locate(name string) (string, error) {
 	}
 	q.Publish("dataServers", name)
 	c := q.Consume()
+	// 1秒后关闭连接
 	go func() {
 		time.Sleep(time.Second)
 		q.Close()

@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -44,6 +45,7 @@ func New(s string) (*RabbitMQ, error) {
 	mq.channel = ch
 	mq.conn = conn
 	mq.Name = q.Name
+	fmt.Println(mq.Name)
 	return mq, nil
 }
 

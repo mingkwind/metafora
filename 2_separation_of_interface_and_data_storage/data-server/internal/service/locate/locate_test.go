@@ -5,6 +5,7 @@ import (
 )
 
 func TestLocate(t *testing.T) {
+	t.Log("Test locate")
 	if !locate("locate.go") {
 		t.Error("locate.go should be found")
 	}

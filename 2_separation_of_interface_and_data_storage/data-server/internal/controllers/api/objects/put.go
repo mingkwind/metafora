@@ -1,12 +1,12 @@
 package objects
 
 import (
+	"data-server/internal/pkg/utils"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
-	"strings"
 )
 
 /*
@@ -60,15 +60,14 @@ func init() {
 		os.MkdirAll(path.Join(os.Getenv("STORAGE_ROOT"), "/objects/"), 0777)
 	}
 }
+
 func putObject(w http.ResponseWriter, r *http.Request) {
 	log.Println("PUT Object: ", r.URL.EscapedPath())
-	fileName := strings.Split(r.URL.EscapedPath(), "/")[2]
-	// 如果文件名为空，则从请求头中获取文件名
-	if fileName == "" {
-		fileName = r.Header.Get("filename")
-	}
-	filePath := path.Join(os.Getenv("STORAGE_ROOT"), "/objects/",
-		fileName)
+	// 从headr中获取hash值
+	hash := utils.GetHashFromHeader(r.Header)
+	log.Println("hash:", hash)
+	filePath := path.Join(os.Getenv("STORAGE_ROOT"), "/objects/", hash)
+	// 创建文件
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.Println(err)
@@ -77,11 +76,6 @@ func putObject(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	io.Copy(file, r.Body)
-	host := os.Getenv("LISTEN_ADDRESS")
-	// 如果没有ip只有端口，则使用默认ip
-	if strings.Split(host, ":")[0] == "" {
-		host = "127.0.0.1" + ":" + strings.Split(host, ":")[1]
-	}
 	// 返回文件路径
-	w.Write([]byte("http://" + host + "/" + fileName))
+	w.Write([]byte("Save OK"))
 }

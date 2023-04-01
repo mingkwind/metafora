@@ -21,6 +21,7 @@ func DeleteObjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func delete(object string) error {
+	//作为最后一个版本
 	return models.PutMetadata(&models.Metadata{
 		Name: object,
 		Size: 0,

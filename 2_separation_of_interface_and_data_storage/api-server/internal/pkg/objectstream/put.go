@@ -12,6 +12,7 @@ type PutStream struct {
 }
 
 // 流式写入的方法
+// 避免一次性将数据全部读入内存
 // 参考https://studygolang.com/articles/29059
 func NewPutStream(server, object string) *PutStream {
 	reader, writer := io.Pipe()

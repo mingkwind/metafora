@@ -1,0 +1,281 @@
+version: "3.7"
+
+services:
+  nginx:
+    # 提供apiserver1和apiserver2的负载均衡
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    depends_on:
+      - apiserver1
+      - apiserver2
+    links:
+      - apiserver1
+      - apiserver2
+    ports:
+      - 8888:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - metaforanet
+
+  apiserver1:
+    #生成容器名称
+    # build: ../api-server
+    container_name: apiserver1
+    image: alpine:latest
+    # 关机或者重启docker同时重启容器
+    restart: always
+    depends_on:
+      - rabbitmq
+      - dataserver1
+      - dataserver2
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:8000
+      - ES_URL=http://elasticsearch:9200
+      - ES_USER=elastic
+      - ES_PASS=123456
+    volumes:
+      - ../api-server/build/apiServer:/app/apiServer
+      - ./wait-for:/wait-for
+    command: sh -c '/wait-for rabbitmq:5672 -- /wait-for elasticsearch:9200 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
+
+  apiserver2:
+    # build: ../api-server
+    container_name: apiserver2
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+      - dataserver1
+      - dataserver2
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:8000
+      - ES_URL=http://elasticsearch:9200
+      - ES_USER=elastic
+      - ES_PASS=123456
+    volumes:
+      - ../api-server/build/apiServer:/app/apiServer
+      - ./wait-for:/wait-for
+    command: sh -c '/wait-for rabbitmq:5672 -- /wait-for elasticsearch:9200 -- /wait-for dataserver1:5000 -- /wait-for dataserver2:5000 -- /app/apiServer'
+
+  dataserver1:
+    # build: ../data-server
+    container_name: dataserver1
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver1:5000
+      - STORAGE_ROOT=/tmp/data1
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data1:/tmp/data1
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver2:
+    # build: ../data-server
+    container_name: dataserver2
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver2:5000
+      - STORAGE_ROOT=/tmp/data2
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data2:/tmp/data2
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver3:
+    # build: ../data-server
+    container_name: dataserver3
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver3:5000
+      - STORAGE_ROOT=/tmp/data3
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data3:/tmp/data3
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver4:
+    # build: ../data-server
+    container_name: dataserver4
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver4:5000
+      - STORAGE_ROOT=/tmp/data4
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data4:/tmp/data4
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver5:
+    # build: ../data-server
+    container_name: dataserver5
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver5:5000
+      - STORAGE_ROOT=/tmp/data5
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data5:/tmp/data5
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver6:
+    # build: ../data-server
+    container_name: dataserver6
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver6:5000
+      - STORAGE_ROOT=/tmp/data6
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data6:/tmp/data6
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver7:
+    # build: ../data-server
+    container_name: dataserver7
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver7:5000
+      - STORAGE_ROOT=/tmp/data7
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data7:/tmp/data7
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  dataserver8:
+    # build: ../data-server
+    container_name: dataserver8
+    image: alpine:latest
+    restart: always
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - metaforanet
+    environment:
+      - RABBITMQ_SERVER=amqp://root:123456@rabbitmq:5672
+      - LISTEN_ADDRESS=0.0.0.0:5000
+      - DATA_SERVER_ADDRESS=dataserver8:5000
+      - STORAGE_ROOT=/tmp/data8
+    volumes:
+      - ../data-server/build/dataServer:/app/dataServer
+      - ./wait-for:/wait-for
+      - ./files/objects/data8:/tmp/data8
+    command: sh -c '/wait-for rabbitmq:5672 -- /app/dataServer'
+
+  elasticsearch:
+    image: elasticsearch:7.17.2
+    container_name: "mtfr_es"
+    restart: always
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      # 开启密码认证
+      - xpack.security.enabled=true
+      # 初始化密码
+      - ELASTIC_PASSWORD=123456
+    volumes:
+      - ./files/es:/usr/share/elasticsearch/data
+    networks:
+      - metaforanet
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    container_name: "mtfr_rabbitmq"
+    restart: always
+    ports:
+      # 暴露给外部的端口
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=123456
+    networks:
+      - metaforanet
+
+networks:
+  metaforanet:
